@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Serviços - Technology Portal (JSM)</title>
+    <style>
+        /* 1. Typography Imports - MANDATORY DESIGN SYSTEM */
+        @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@700&family=Figtree:wght@300;400;600&display=swap');
+
+        /* 2. CSS Variables (Design System) */
+        :root {
+            --color-text: #24282A;
+            --color-header-text: #231372; /* Headers & Primary Dark (Roxo principal) */
+            --color-highlight: #20E2C8; /* Buttons & Accents (Verde) */
+            --color-accent: #6106AF; /* Secondary Accent (Roxo Secundário) */
+            --color-header-bg: #FFFFFF;
+            --color-light-gray: #e9ecef; /* Cinza claro para fundo de nós */
+            --color-mid-gray: #adb5bd; /* Cinza médio para textos de campo */
+            --color-dark-gray: #495057; /* Cinza escuro para detalhes */
+            --font-body: 'Figtree', sans-serif;
+            --font-header: 'Barlow', sans-serif;
+        }
+
+        /* 3. Global Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--color-text);
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            padding-top: 100px;
+            font-weight: 400;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: var(--font-header);
+            color: var(--color-header-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        
+        /* 4. Structural Styles */
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 0;
+        }
+
+        /* Fixed Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--color-header-bg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        /* Hero Section */
+        .hero {
+            background-color: var(--color-header-bg);
+            padding: 40px 0 20px 0; /* Ajuste no padding */
+            text-align: center;
+            border-bottom: 5px solid var(--color-accent);
+        }
+        .hero p {
+            display: none; /* Descrição removida */
+        }
+
+        /* 5. Service Tree (Infográfico) Styling - Níveis 1 e 2 (Grupos) */
+        .service-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 0;
+        }
+        .node {
+            background-color: var(--color-header-bg);
+            border: 1px solid var(--color-light-gray);
+            border-radius: 6px;
+            padding: 10px 15px;
+            text-align: center;
+            margin: 10px 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            z-index: 10;
+        }
+        .root-node { /* Nível 1 */
+            background-color: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .root-node h3 { color: white; font-weight: 700; }
+        .root-node::after {
+            content: ''; position: absolute; bottom: -30px; left: 50%; width: 2px; height: 30px;
+            background-color: var(--color-header-text); transform: translateX(-50%); z-index: 1;
+        }
+        .category-level { /* Container horizontal Nível 2 */
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; width: 100%;
+            position: relative; padding-bottom: 30px;
+        }
+        .category-level::before { /* Linha horizontal Nível 2 */
+            content: ''; position: absolute; top: 0; width: 98%; height: 2px;
+            background-color: var(--color-header-text); z-index: 5;
+        }
+        .category-group {
+            flex: 1 1 120px; max-width: 130px; display: flex; flex-direction: column;
+            align-items: center; position: relative;
+        }
+        .category-group .node:first-child { /* Nós Nível 2 */
+            background-color: var(--color-light-gray); color: var(--color-header-text);
+            border-color: var(--color-header-text); font-weight: 700; font-size: 0.9rem;
+            margin-top: 35px; min-height: 45px; display: flex; align-items: center; justify-content: center;
+        }
+        .category-group .node:first-child h4 { color: var(--color-header-text); line-height: 1.1; }
+        .category-group .node:first-child::before { /* Linha vertical Nível 2 */
+            content: ''; position: absolute; top: -35px; left: 50%; width: 2px; height: 35px;
+            background-color: var(--color-header-text); transform: translateX(-50%); z-index: 1;
+        }
+
+        /* Nível 3: Request Types - Containers Clicáveis */
+        .request-type-block { padding-top: 15px; width: 100%; }
+        .request-type-container {
+            border: 1px solid var(--color-light-gray);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: box-shadow 0.2s, background-color 0.2s, border-color 0.2s;
+        }
+        .request-type-container:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            background-color: #f1f3f5;
+        }
+        .request-type-container.is-active {
+            border-color: var(--color-accent);
+            background-color: #f1f3f5;
+            box-shadow: 0 4px 10px rgba(97, 6, 175, 0.1);
+        }
+
+        .request-type-node {
+            padding: 8px; margin: 0; border: none; box-shadow: none;
+        }
+        .request-type-node h5 {
+            color: var(--color-accent);
+            font-size: 0.75rem; line-height: 1.2; min-height: 30px; font-weight: 600;
+        }
+
+        /* 6. Painéis de Detalhe (Compartilhado) */
+        #form-detail-panel, #backoffice-panel {
+            min-height: 300px;
+            padding: 40px;
+            margin-top: 60px;
+            background-color: var(--color-header-bg);
+            border: 2px solid var(--color-accent);
+            border-radius: 8px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            display: none; /* Inicia oculto */
+        }
+        #form-detail-panel.visible, #backoffice-panel.visible {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+
+        /* Navegação de Painel (Botões) */
+        .panel-nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--color-light-gray);
+            padding-bottom: 15px;
+        }
+        .panel-nav button {
+            cursor: pointer;
+            padding: 8px 15px;
+            font-family: var(--font-header);
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: none;
+            border: none;
+            color: var(--color-mid-gray);
+            border-bottom: 3px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .panel-nav button.active {
+            color: var(--color-header-text);
+            border-bottom-color: var(--color-accent);
+        }
+
+        /* Estilos do Formulário (Simulação JSM) */
+        #form-detail-content form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding-bottom: 20px;
+        }
+        .form-field-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-field-group label {
+            font-family: var(--font-body); font-size: 0.85rem; color: var(--color-header-text);
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .form-field-group input:not([type="submit"]), .form-field-group textarea, .form-field-group select {
+            padding: 10px; border: 1px solid var(--color-mid-gray); border-radius: 4px;
+            font-family: var(--font-body); font-size: 1rem; color: var(--color-text);
+        }
+        .form-field-group textarea { min-height: 100px; resize: vertical; }
+        .submit-area { grid-column: 1 / -1; text-align: center; margin-top: 30px; }
+        .submit-area button {
+            cursor: pointer; display: inline-block; padding: 12px 25px; background-color: var(--color-highlight);
+            color: var(--color-header-text) !important; font-family: var(--font-header); font-weight: 700;
+            border: none; border-radius: 4px; font-size: 1rem; transition: background-color 0.2s, transform 0.1s;
+        }
+
+        /* Estilos do Backoffice (Tabela de Configurações) */
+        .backoffice-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .metadata-section {
+            padding: 20px;
+            border: 1px solid var(--color-light-gray);
+            border-radius: 6px;
+            background-color: var(--color-light-gray);
+        }
+        .metadata-section h3 {
+            color: var(--color-accent);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--color-mid-gray);
+            padding-bottom: 5px;
+        }
+        .metadata-section div {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        .metadata-section strong {
+            color: var(--color-dark-gray);
+            font-weight: 600;
+            display: inline-block;
+            min-width: 100px;
+            margin-right: 5px;
+        }
+        .metadata-full-text {
+            border-left: 3px solid var(--color-highlight);
+            padding-left: 10px;
+            margin-top: 15px;
+            background-color: var(--color-header-bg);
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .metadata-full-text p {
+            margin: 0;
+            color: var(--color-dark-gray);
+        }
+
+        /* 8. Responsiveness */
+        @media (max-width: 768px) {
+            .category-group { max-width: 90%; width: 100%; margin-bottom: 0; }
+            #form-detail-content form { grid-template-columns: 1fr; }
+            .backoffice-grid { grid-template-columns: 1fr; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Fixed Header with Mandatory SVG Logo -->
+    <header>
+        <svg id="Camada_2" style="height: 70px; width: auto;" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 837.7 245.66"><defs><style>.cls-1{fill:none;}.cls-2{clip-path:url(#clippath-1);}.cls-3{fill:url(#Gradiente_sem_nome_10);}.cls-4{fill:#24282a;}.cls-5{clip-path:url(#clippath);}</style><clipPath id="clippath"><rect class="cls-1" x="546.28" y="39.03" width="110.43" height="113"/></clipPath><clipPath id="clippath-1"><rect class="cls-1" width="240.06" height="245.66"/></clipPath><linearGradient id="Gradiente_sem_nome_10" data-name="Gradiente sem nome 10" x1="5622.93" y1="5321.6" x2="5624.11" y2="5322.12" gradientTransform="translate(-1349792.92 1307463.94) scale(240.05 -245.66)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1b1f59"/><stop offset="1" stop-color="#0fc"/></linearGradient></defs><g id="Camada_1" data-name="Camada 1"><g id="Grupo_149" data-name="Grupo 149"><g id="Grupo_42-2" data-name="Grupo 42-2"><path id="Caminho_389-2" data-name="Caminho 389-2" class="cls-4" d="M452.05,129.69v18.74c0,1.99-1.61,3.6-3.6,3.6h-67.98c-1.99,0-3.6-1.61-3.6-3.6h0V42.63c0-1.99,1.61-3.6,3.6-3.6h20.9c1.99,0,3.6,1.61,3.6,3.6h0v83.46h43.47c1.99,0,3.6,1.61,3.61,3.59h0Z"/><path id="Caminho_392-2" data-name="Caminho 392-2" class="cls-4" d="M821.22,116.37l-2.89-5.46c17.91-12.4,22.38-36.97,9.99-54.88-7.37-10.65-19.49-17-32.44-17h-41.65c-1.99,0-3.6,1.61-3.6,3.6v105.8c0,1.99,1.61,3.6,3.6,3.6h20.81c2.04,0,3.7-1.66,3.7-3.7v-30.56c0-.77.63-1.4,1.4-1.4h8.8c.52,0,1,.29,1.24.75l.23.43,17.21,32.51c.64,1.22,1.91,1.98,3.29,1.98h23.18c2,0,3.62-1.63,3.62-3.63,0-.59-.15-1.17-.42-1.69l-16.06-30.34ZM805.1,85.93c-2.59,4.22-7.18,6.79-12.13,6.78h-14.24v-28.46h14.9v.02c7.86.37,13.93,7.03,13.56,14.89-.11,2.4-.83,4.73-2.09,6.78h0Z"/><path id="Caminho_390-2" data-name="Caminho 390-2" class="cls-4" d="M370.4,140.66c.53.99.24,2.22-.67,2.87-26.46,18.91-63.23,12.79-82.14-13.66-18.91-26.46-12.79-63.23,13.66-82.14,20.48-14.64,47.99-14.64,68.47,0,.91.66,1.19,1.88.67,2.88l-10.45,19.73c-.93,1.76-3.11,2.42-4.87,1.49-.2-.1-.38-.23-.55-.36-13.36-10.51-32.71-8.21-43.22,5.15-10.51,13.36-8.21,32.71,5.15,43.22,11.17,8.79,26.91,8.79,38.08,0,1.55-1.24,3.82-.99,5.06.57.14.17.26.36.37.56l10.44,19.73Z"/><path id="Caminho_388-2" data-name="Caminho 388-2" class="cls-4" d="M487.03,64.97v18.73h37.96c1.99,0,3.6,1.61,3.6,3.6v16.46c0,1.99-1.61,3.6-3.6,3.6h-37.96v18.73h49.15c1.99,0,3.6,1.61,3.6,3.6v18.74c0,1.99-1.61,3.6-3.6,3.6h-73.66c-1.99,0-3.6-1.61-3.6-3.6V42.63c0-1.99,1.61-3.6,3.6-3.6h73.66c1.99,0,3.6,1.61,3.6,3.6v18.65c0,2.04-1.65,3.69-3.69,3.69h-49.06Z"/><path id="Caminho_391-2" data-name="Caminho 391-2" class="cls-4" d="M691.37,64.97v18.73h37.96c1.99,0,3.6,1.61,3.6,3.6v16.46c0,1.99-1.61,3.6-3.6,3.6h-37.96v18.73h49.15c1.99,0,3.6,1.61,3.6,3.6v18.74c0,1.99-1.61,3.6-3.6,3.6h-73.66c-1.99,0-3.6-1.61-3.6-3.6V42.63c0-1.99,1.61-3.6,3.6-3.6h73.66c1.99,0,3.6,1.61,3.6,3.6v18.65c0,2.04-1.65,3.69-3.69,3.69h-49.06Z"/><g id="Grupo_29-2" data-name="Grupo 29-2"><g class="cls-5"><g id="Grupo_4-3" data-name="Grupo 4-3"><path id="Caminho_204-3" data-name="Caminho 204-3" class="cls-4" d="M656.55,42.1l-42.22,107.61c-.55,1.4-1.9,2.32-3.41,2.32h-18.86c-1.51,0-2.86-.92-3.41-2.32l-42.22-107.61c-.45-1.15.11-2.46,1.27-2.91.26-.1.54-.16.82-.16h24.31c1.54,0,2.92.96,3.45,2.41l25.21,69.57,15.99-44.09c.27-.74-.12-1.55-.85-1.82-.15-.06-.32-.08-.48-.08h-15.82c-1.24,0-2.25-1-2.25-2.25,0-.26.05-.52.13-.77l7.45-20.56c.53-1.45,1.9-2.41,3.44-2.41h45.35c1.24,0,2.25,1.01,2.25,2.25,0,.28-.05.56-.16.82"/></g></g></g></g><g id="Grupo_43-2" data-name="Grupo 43-2"><path id="Caminho_393-2" data-name="Caminho 393-2" class="cls-4" d="M310.46,207.36c0,.24-.09.46-.27.62-.22.17-.5.26-.77.24h-6.76c-.33,0-.66-.11-.92-.32-.28-.21-.49-.5-.61-.82l-1.57-4.57h-12.07l-1.55,4.55c-.09.33-.29.62-.57.82-.28.21-.62.33-.98.32h-6.74c-.28.02-.55-.06-.77-.23-.18-.16-.29-.39-.27-.63,0-.19.05-.37.12-.55l12.72-32.27c.14-.34.38-.64.68-.86.27-.2.6-.31.94-.31h5.02c.34,0,.67.12.94.32.29.21.51.51.63.85l12.69,32.29c.07.17.11.36.12.55M297.1,195.31l-3.6-10.55-3.6,10.55h7.2Z"/><path id="Caminho_394-2" data-name="Caminho 394-2" class="cls-4" d="M338.14,174.64c0-.34.13-.66.37-.89.23-.24.56-.38.89-.37h10.81c3.16-.05,6.28.71,9.06,2.23,2.61,1.44,4.77,3.58,6.23,6.19,1.52,2.76,2.29,5.86,2.24,9.01.05,3.14-.72,6.23-2.24,8.98-1.46,2.6-3.61,4.74-6.23,6.17-2.78,1.51-5.9,2.27-9.06,2.21h-10.81c-.7,0-1.26-.56-1.26-1.26h0v-32.27ZM350.21,199.97c3.23.04,6.21-1.71,7.74-4.55.77-1.42,1.16-3.01,1.14-4.62.02-1.66-.37-3.3-1.14-4.76-1.5-2.87-4.5-4.65-7.74-4.59l-3.43.02v18.5h3.43Z"/><path id="Caminho_395-2" data-name="Caminho 395-2" class="cls-4" d="M425.13,173.56c.18.15.28.38.26.62,0,.2-.04.39-.12.57l-12.72,32.27c-.13.35-.36.65-.65.87-.27.21-.6.32-.94.32h-5.02c-.35,0-.68-.12-.95-.33-.29-.21-.52-.5-.64-.83l-12.67-32.29c-.07-.17-.11-.36-.12-.55,0-.23.09-.46.26-.61.22-.16.49-.25.76-.23h6.76c.34,0,.67.11.94.32.28.21.48.51.58.85l7.55,21,7.67-21.05c.1-.34.31-.63.6-.83.27-.2.59-.31.93-.31h6.76c.27-.02.54.06.76.21"/><path id="Caminho_396-2" data-name="Caminho 396-2" class="cls-4" d="M452.9,174.64c-.02-.34.1-.68.33-.93.25-.23.59-.35.93-.33h22.4c.34-.02.68.1.93.33.23.25.35.59.33.93v5.48c.02.34-.1.67-.32.93-.25.24-.59.36-.94.33h-15.12v5.76h11.48c.37-.02.73.1,1.01.35.26.25.39.61.37.97v4.53c.02.35-.12.69-.37.93-.28.24-.64.36-1.01.33h-11.48v5.93h15.12c.47-.03.92.13,1.27.44.32.31.49.74.46,1.18v5.14c.02.34-.11.66-.35.9-.26.23-.6.35-.94.33h-22.85c-.34.02-.67-.09-.93-.32-.23-.25-.36-.58-.33-.92v-32.29Z"/><path id="Caminho_397-2" data-name="Caminho 397-2" class="cls-4" d="M534.29,207.26c0,.51-.4.92-.9.93-.02,0-.03,0-.05,0h-7.12c-.29.02-.58-.06-.82-.23-.27-.24-.48-.52-.63-.85l-5.1-9.81h-3.55v9.62c.02.34-.11.68-.35.93-.26.23-.61.35-.96.33h-6.1c-.34.02-.67-.1-.92-.33-.23-.25-.34-.59-.32-.93v-32.29c-.01-.34.11-.66.35-.9.23-.24.56-.37.89-.36h12.22c2.26-.04,4.49.47,6.5,1.49,1.85.95,3.38,2.42,4.42,4.23,1.09,1.94,1.64,4.14,1.59,6.36.03,2.04-.46,4.06-1.42,5.86-.92,1.71-2.29,3.13-3.96,4.12l6.1,11.31c.1.16.14.34.14.52M516.12,189.85h4.45c.77.01,1.52-.2,2.18-.6.64-.39,1.16-.95,1.51-1.62.37-.69.56-1.46.55-2.24.01-.76-.18-1.51-.55-2.18-.35-.63-.88-1.15-1.51-1.5-.67-.36-1.42-.55-2.18-.53h-4.45v8.67Z"/><path id="Caminho_398-2" data-name="Caminho 398-2" class="cls-4" d="M561.13,174.64c-.02-.34.1-.68.33-.93.25-.23.59-.35.93-.33h23.24c.34-.02.68.1.93.33.23.25.35.59.33.93v5.74c.02.35-.1.68-.33.94-.25.24-.58.37-.93.35h-7.31v25.55c.02.35-.1.69-.33.94-.26.23-.6.35-.95.32h-6.1c-.64.06-1.2-.4-1.26-1.04,0-.07,0-.15,0-.22v-25.55h-7.29c-.34.02-.68-.1-.93-.35-.23-.26-.35-.6-.33-.94v-5.74Z"/><path id="Caminho_399-2" data-name="Caminho 399-2" class="cls-4" d="M623.9,207.24c.07.44-.23.86-.68.93-.07.01-.15.01-.22,0h-6.79c-.46.06-.87-.27-.93-.73,0-.07,0-.14,0-.2v-32.94c-.06-.44.26-.85.7-.9.07,0,.15,0,.22,0h6.79c.44-.06.84.25.9.69,0,.07,0,.14,0,.21v32.94Z"/><path id="Caminho_400-2" data-name="Caminho 400-2" class="cls-4" d="M652.91,204.31c.01-.3.1-.6.26-.86l2.81-5.05c.2-.41.62-.67,1.07-.67.27.01.54.08.79.19,1.47.68,2.99,1.24,4.55,1.68,1.51.41,3.06.61,4.62,0.61,1.06,0.03,2.12-0.21,3.06-0.7,0.75-0.34,1.24-1.07,1.25-1.89,0-0.58-0.25-1.13-0.7-1.5-0.6-0.49-1.27-0.86-2-1.12-0.87-0.33-2.09-0.73-3.66-1.19-2.07-0.58-4.08-1.36-6-2.34-1.43-0.74-2.65-1.83-3.54-3.18-0.87-1.47-1.29-3.15-1.22-4.86-0.05-2.05,0.57-4.07,1.76-5.74,1.2-1.62,2.82-2.88,4.69-3.63,2.01-0.83,4.17-1.25,6.35-1.23,1.47,0,2.94,0.17,4.37,0.5,1.37,0.3,2.71,0.73,4.01,1.26,1.03,0.42,2.02,0.93,2.95,1.52,0.41,0.21,0.68,0.62,0.71,1.07-0.03,0.32-0.13,0.63-0.31,0.9l-2.83,5.14c-0.17,0.38-0.56,0.62-0.98,0.62-0.37-0.02-0.73-0.13-1.05-0.31-1.18-0.62-2.41-1.14-3.68-1.56-1.23-0.37-2.51-0.55-3.8-0.54-0.91-0.02-1.81,0.2-2.6,0.64-0.64,0.29-1.07,0.92-1.1,1.62,0,0.7,0.47,1.3,1.41,1.8,1.45,0.69,2.97,1.25,4.53,1.65,2.14,0.6,4.22,1.37,6.24,2.3,1.52,0.71,2.84,1.79,3.83,3.14,1.03,1.52,1.53,3.33,1.45,5.16,0.04,2.1-0.58,4.15-1.79,5.87-1.23,1.71-2.91,3.04-4.86,3.85-2.15,0.91-4.46,1.36-6.79,1.33-2.35,0-4.68-0.31-6.95-0.9-2.2-0.56-4.31-1.43-6.26-2.6-0.38-0.19-0.61-0.58-0.62-1"/></g><path id="Caminho_401-2" data-name="Caminho 401-2" class="cls-4" d="M717.37,207.24c.07.44-.23.86-.68.93-.08.01-.15.01-.23,0h-6.79c-.46.06-.87-.27-.93-.73,0-.07,0-.14,0-.2v-32.94c-.06-.44.26-.85.7-.9.07,0,.15,0,.22,0h6.79c.44-.06.84.24.9.68.01.07.01.15,0,.22v32.94Z"/><path id="Caminho_402-2" data-name="Caminho 402-2" class="cls-4" d="M778.6,173.61c.17.19.26.44.24.69v32.96c.02.26-.07.51-.25.69-.19.17-.43.25-.68.24h-6.48c-.75,0-1.45-.41-1.81-1.07l-13.38-20.36v20.5c.02.25-.07.51-.25.69-.19.17-.43.25-.68.24h-6.79c-.25.01-.49-.07-.68-.24-.18-.18-.27-.44-.25-.69v-32.95c-.02-.25.07-.51.25-.69.19-.17.43-.25.68-.24h7.03c.75.04,1.42.46,1.79,1.12l12.88,19.15v-19.34c-.02-.25.07-.5.24-.69.18-.17.42-.25.67-.24h6.79c.25-.02.5.07.69.24"/><path id="Caminho_403-2" data-name="Caminho 403-2" class="cls-4" d="M827.49,200.03c.61-.16,1.2-.37,1.76-.66v-6.14c-.01-.34.12-.67.37-.91.24-.23.56-.36.89-.36h5.98c.32,0,.64.13.86.37.23.24.36.56.36.89v11.36c0,.26-.07.51-.19.74-.1.23-.27.42-.48.55-1.63.97-3.4,1.7-5.25,2.14-1.96.55-3.98.85-6.01.88-3.24.03-6.43-.79-9.24-2.4-2.75-1.56-5.04-3.82-6.63-6.55-1.63-2.77-2.47-5.93-2.44-9.15-.04-6.48,3.42-12.47,9.05-15.67,2.81-1.61,6-2.44,9.24-2.41,1.91.02,3.81.34,5.62.94,1.76.51,3.41,1.35,4.86,2.47.33.23.53.62.52,1.02,0,.24-.07.47-.22.67l-3.5,5.26c-.19.32-.53.51-.91.5-.3,0-.59-.1-.81-.31-.78-.65-1.68-1.13-2.64-1.44-.93-.33-1.92-.5-2.91-.51-1.71-.02-3.39.42-4.88,1.26-1.45.82-2.66,2-3.5,3.44-1.71,2.96-1.71,6.61,0,9.57.84,1.44,2.05,2.62,3.5,3.44,1.49.84,3.17,1.28,4.88,1.26.58-.02,1.16-.11,1.72-.27"/></g><g id="Grupo_41-2" data-name="Grupo 41-2"><g class="cls-2"><g id="Grupo_4-4" data-name="Grupo 4-4"><path id="Caminho_204-4" data-name="Caminho 204-4" class="cls-3" d="M239.71,6.67l-91.78,233.94c-1.2,3.05-4.14,5.05-7.41,5.05h-41c-3.27,0-6.21-2.01-7.41-5.05L.34,6.67C-.64,4.16.59,1.32,3.1.34,3.67.11,4.28,0,4.89,0h52.84c3.35,0,6.34,2.1,7.48,5.25l54.82,151.23,34.75-95.85c.58-1.6-.25-3.37-1.85-3.95-.34-.12-.69-.19-1.05-.18h-34.39c-2.7,0-4.88-2.19-4.88-4.88,0-.57.1-1.13.29-1.66l16.2-44.7c1.14-3.15,4.13-5.25,7.49-5.25h98.59c2.7,0,4.88,2.19,4.88,4.88,0,.61-.11,1.22-.34,1.78"/></g></g></g></g></g></svg>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>CATÁLOGO DE SERVIÇOS</h1>
+                <!-- Descrição removida -->
+            </div>
+        </section>
+
+        <section class="service-tree">
+            <!-- NÍVEL 1: CATÁLOGO GERAL -->
+            <div class="node root-node">
+                <h3>CATÁLOGO DE SERVIÇOS 2025</h3>
+            </div>
+
+            <!-- NÍVEL 2: GRUPOS ESPECÍFICOS (LINHA HORIZONTAL) -->
+            <div class="category-level container">
+                
+                <!-- GRUPO 1: ADVERTISING -->
+                <div class="category-group">
+                    <div class="node">
+                        <h4>ADVERTISING</h4>
+                    </div>
+                    <div class="request-type-block">
+                        <!-- NÍVEL 3: Advertising Issues -->
+                        <div class="request-type-container" 
+                             data-target="adv-issues" 
+                             data-title="Advertising Issues"
+                             data-config='{"Cesta de atendimento": "N1 Service", "Produto": "Advertising", "Type Issue": "Incidente", "Criticidade": ["Baixa", "Média"], "SLA N1": "1h", "SLA N2": "1h", "SLA ESP": "6h", "Workflow": "ITS Workflow - Defaut Portal Technology v5 Imp e Advs", "Labels": "Advertising, Bulk Change, Business Rules, Hook, Garbage, Performance, Product Error, Script or Tag Position, Third Party Integration (API), Campaign Config. - User Error, Campaign Config. - Publisher Error, Website Config./Structure", "Proprietário": "N1 Service"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Advertising Issues</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Creatives -->
+                        <div class="request-type-container" 
+                             data-target="adv-creatives" 
+                             data-title="Creatives"
+                             data-config='{"Cesta de atendimento": "Thiago Araújo", "Produto": "Creatives", "Type Issue": "Inicident / Request", "Criticidade": ["Alto", "Médio", "Baixo"], "SLA N1": "10 minutos", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS Workflow - Defaut Portal Technology v5", "Labels": "Creatives - New, Creatives - Change/edit", "Proprietário": "Thiago Araújo"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Creatives</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Hook -->
+                        <div class="request-type-container" 
+                             data-target="adv-hook" 
+                             data-title="Hook"
+                             data-config='{"Cesta de atendimento": "N1 Service", "Produto": "Hook", "Type Issue": "Inicident / Request", "Criticidade": ["Alto", "Médio", "Baixo"], "SLA N1": "30 minutinhos", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS Workflow - Defaut Portal Technology v5", "Labels": "Hook", "Proprietário": "N1 Service"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Hook</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Fingerprint Issues -->
+                        <div class="request-type-container" 
+                             data-target="adv-fingerprint" 
+                             data-title="Fingerprint Issues"
+                             data-config='{"Cesta de atendimento": "Caio Couto e João Eugenio", "Produto": "Fingerprint Issues", "Type Issue": "-", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS Workflow - Defaut Portal Technology v5 Imp e Advs", "Labels": "-", "Proprietário": "Caio Couto e João Eugenio"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Fingerprint Issues</h5></div>
+                        </div>
+                         <!-- NÍVEL 3: Traffic Analisys -->
+                         <div class="request-type-container" 
+                             data-target="adv-traffic" 
+                             data-title="Traffic Analisys"
+                             data-config='{"Cesta de atendimento": "N1 Service", "Produto": "Traffic", "Type Issue": "Incident / Request", "Criticidade": ["Baixa", "Média", "Alta"], "SLA N1": "4h", "SLA N2": "8h", "SLA ESP": "23h", "Workflow": "ITS Workflow - Defaut Portal Technology v5 Imp e Advs", "Labels": "Traffic, Campaign Segmentation, Product Error, Script or Tag Position, Traffic Injection / Bot, Website Config./Structure", "Proprietário": "N1 Service"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Traffic Analisys</h5></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRUPO 2: SOFTWARES -->
+                <div class="category-group">
+                    <div class="node">
+                        <h4>SOFTWARES</h4>
+                    </div>
+                    <div class="request-type-block">
+                        <!-- NÍVEL 3: Issues Softwares (External Softwares) -->
+                        <div class="request-type-container" 
+                             data-target="soft-issues" 
+                             data-title="Issues Softwares"
+                             data-config='{"Cesta de atendimento": "N1 Infra", "Produto": "Issues Softwares (External Softwares)", "Type Issue": "Incident / Problem", "Criticidade": ["Baixa", "Média", "Alta"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS Workflow - Defaut Portal Technology v5", "Labels": "Adobe, AWS, Canva, Checkpoint, Clever Ads, Cloudflare, Confluence, Cyberghost, Docker, Figma, Fortinet, Froxy, Github, Grafana, HMA, Jira, Kandji, Keeper, Kibana, Miro, NexusGen, No Code, Papyro, Parallels, PBI Dashboard, PBI Pro, PIA, Printers, PureDome, Sage, SimilarWeb, Slack, TeamTailor, Technical Room, Vault, VPN - FortiClient", "Proprietário": "Vários"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Issues Softwares</h5></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRUPO 3: HARDWARE -->
+                <div class="category-group">
+                    <div class="node">
+                        <h4>HARDWARE</h4>
+                    </div>
+                    <div class="request-type-block">
+                        <!-- NÍVEL 3: Accessories -->
+                        <div class="request-type-container" 
+                             data-target="hard-accessories" 
+                             data-title="Accessories"
+                             data-config='{"Cesta de atendimento": "Marco Sousa e Jeferson Calvalcanti", "Produto": "Accessories / Notebook, New Equipment, Swap Equipment, Equipment Maintenance, Equipment - Obsolete, Printer", "Type Issue": "-", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS Workflow - Defaut Portal Technology v5", "Labels": "Acessories / Notebook", "Proprietário": "Marco Sousa e Jeferson Calvalcanti"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Accessories</h5></div>
+                        </div>
+                         <!-- NÍVEL 3: Notebook -->
+                        <div class="request-type-container" 
+                             data-target="hard-notebook" 
+                             data-title="Notebook"
+                             data-config='{"Cesta de atendimento": "Marco Sousa e Jeferson Calvalcanti", "Produto": "Notebook", "Type Issue": "-", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS Workflow - Defaut Portal Technology v5", "Labels": "Notebook", "Proprietário": "Marco Sousa e Jeferson Calvalcanti"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Notebook</h5></div>
+                        </div>
+                         <!-- NÍVEL 3: Printer -->
+                        <div class="request-type-container" 
+                             data-target="hard-printer" 
+                             data-title="Printer"
+                             data-config='{"Cesta de atendimento": "Marco Sousa e Jeferson Calvalcanti", "Produto": "Printer", "Type Issue": "-", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS Workflow - Defaut Portal Technology v5", "Labels": "Printer", "Proprietário": "Marco Sousa e Jeferson Calvalcanti"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Printer</h5></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRUPO 4: ACCESS -->
+                <div class="category-group">
+                    <div class="node">
+                        <h4>ACCESS</h4>
+                    </div>
+                    <div class="request-type-block">
+                        <!-- NÍVEL 3: Internal Application -->
+                        <div class="request-type-container" 
+                             data-target="access-internal" 
+                             data-title="Internal Application"
+                             data-config='{"Cesta de atendimento": "Maurício Andrade", "Produto": "Internal Application", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra Access", "Labels": "Access, Settings, User Error, Licence assignment + installation, Licence assignment, Installation, Access/Permissions - Provide, Access/Permissions - Remove, Access/Permissions - Change", "Proprietário": "Maurício Andrade"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Internal Application</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: External Application (4 menções no doc) -->
+                        <div class="request-type-container" 
+                             data-target="access-external" 
+                             data-title="External Application"
+                             data-config='{"Cesta de atendimento": "Vários", "Produto": "External Application", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra Access", "Labels": "Access, Settings, User Error", "Proprietário": "Vários (Kleber, Gabriel, N1 Infra)"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>External Application</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Email -->
+                        <div class="request-type-container" 
+                             data-target="access-email" 
+                             data-title="Email"
+                             data-config='{"Cesta de atendimento": "Fernanda Ramos", "Produto": "Email", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra Access", "Labels": "Access, Settings, User Error", "Proprietário": "Fernanda Ramos"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Email</h5></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRUPO 5: OUTSOURCING IT -->
+                <div class="category-group">
+                    <div class="node">
+                        <h4>OUTSOURCING IT</h4>
+                    </div>
+                    <div class="request-type-block">
+                        <!-- NÍVEL 3: Admission -->
+                        <div class="request-type-container" 
+                             data-target="out-admission" 
+                             data-title="Admission"
+                             data-config='{"Cesta de atendimento": "Fernanda Ramos e Mário Pacheco", "Produto": "Admission", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra Access", "Labels": "Admission", "Proprietário": "Fernanda Ramos e Mário Pacheco"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Admission</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Resignation -->
+                        <div class="request-type-container" 
+                             data-target="out-resignation" 
+                             data-title="Resignation"
+                             data-config='{"Cesta de atendimento": "Fernanda Ramos e Mário Pacheco", "Produto": "Resignation", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra Access", "Labels": "Resignation", "Proprietário": "Fernanda Ramos e Mário Pacheco"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Resignation</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Internal Mobility -->
+                        <div class="request-type-container" 
+                             data-target="out-mobility" 
+                             data-title="Internal Mobility"
+                             data-config='{"Cesta de atendimento": "Fernanda Ramos e Mário Pacheco", "Produto": "Internal Mobility", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra Access", "Labels": "Internal Mobility", "Proprietário": "Fernanda Ramos e Mário Pacheco"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Internal Mobility</h5></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRUPO 6: DATA -->
+                <div class="category-group">
+                    <div class="node">
+                        <h4>DATA</h4>
+                    </div>
+                    <div class="request-type-block">
+                        <!-- NÍVEL 3: Kibana -->
+                        <div class="request-type-container" 
+                             data-target="data-kibana" 
+                             data-title="Kibana"
+                             data-config='{"Cesta de atendimento": "N1 Service", "Produto": "Kibana", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS Workflow - Defaut Portal Technology v5", "Labels": "Data Base, Queries, Data Adjustment, Access/Permissions, Load Information, PowerBI, Data Adjustment, Improvements, New Vision, Access/Permissions, RPA, New Account, Data Reimport, Bug", "Proprietário": "N1 Service"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Kibana</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Data Base -->
+                        <div class="request-type-container" 
+                             data-target="data-database" 
+                             data-title="Data Base"
+                             data-config='{"Cesta de atendimento": "Maurício Andrade", "Produto": "Data Base", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra", "Labels": "Data Base, Queries, Data Adjustment", "Proprietário": "Maurício Andrade"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Data Base</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Power BI -->
+                        <div class="request-type-container" 
+                             data-target="data-powerbi" 
+                             data-title="Power BI"
+                             data-config='{"Cesta de atendimento": "João Santos / N1 Service", "Produto": "PowerBI", "Type Issue": "Request / Incident", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Data Power BI / ITS Workflow - Defaut Portal Technology v5", "Labels": "PowerBI, Data Adjustment, Improvements, New Vision, Access/Permissions", "Proprietário": "João Santos / N1 Service"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Power BI</h5></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRUPO 7: NETWORK -->
+                <div class="category-group">
+                    <div class="node">
+                        <h4>NETWORK</h4>
+                    </div>
+                    <div class="request-type-block">
+                        <!-- NÍVEL 3: Antivirus -->
+                        <div class="request-type-container" 
+                             data-target="net-antivirus" 
+                             data-title="Antivirus"
+                             data-config='{"Cesta de atendimento": "Hugo Martins", "Produto": "Antivirus", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra", "Labels": "Antivirus, Settings, Instalation", "Proprietário": "Hugo Martins"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Antivirus</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Network/Wifi -->
+                        <div class="request-type-container" 
+                             data-target="net-wifi" 
+                             data-title="Network/Wifi"
+                             data-config='{"Cesta de atendimento": "David Martins", "Produto": "Network", "Type Issue": "Incident", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra", "Labels": "Network, Wi-fi, Network Cable", "Proprietário": "David Martins"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Network/Wifi</h5></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- GRUPO 8: SECURITY -->
+                <div class="category-group">
+                    <div class="node">
+                        <h4>SECURITY</h4>
+                    </div>
+                    <div class="request-type-block">
+                        <!-- NÍVEL 3: Phishing Report -->
+                        <div class="request-type-container" 
+                             data-target="sec-phishing" 
+                             data-title="Phishing Report"
+                             data-config='{"Cesta de atendimento": "Hugo Martins", "Produto": "Phishing Report", "Type Issue": "Incident", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra Access", "Labels": "Phishing Report", "Proprietário": "Hugo Martins"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Phishing Report</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: New solution Request -->
+                        <div class="request-type-container" 
+                             data-target="sec-newsol" 
+                             data-title="New solution Request"
+                             data-config='{"Cesta de atendimento": "Hugo Martins", "Produto": "New solution Request", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra Access", "Labels": "New solution Request", "Proprietário": "Hugo Martins"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>New solution Request</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Biometric Control -->
+                        <div class="request-type-container" 
+                             data-target="sec-biometric" 
+                             data-title="Biometric Control"
+                             data-config='{"Cesta de atendimento": "David Martins", "Produto": "Biometric Control", "Type Issue": "Incident", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra Access", "Labels": "Biometric Control", "Proprietário": "David Martins"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Biometric Control</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Information Security Report -->
+                        <div class="request-type-container" 
+                             data-target="sec-info" 
+                             data-title="Information Security Report"
+                             data-config='{"Cesta de atendimento": "Hugo Martins", "Produto": "Information Security Report", "Type Issue": "Report", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra Access", "Labels": "Information Security Report", "Proprietário": "Hugo Martins"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Information Security Report</h5></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRUPO 9: WEBSITE/DOMAIN -->
+                <div class="category-group">
+                    <div class="node">
+                        <h4>WEBSITE/DOMAIN</h4>
+                    </div>
+                    <div class="request-type-block">
+                        <!-- NÍVEL 3: Site -->
+                        <div class="request-type-container" 
+                             data-target="web-site" 
+                             data-title="Site"
+                             data-config='{"Cesta de atendimento": "Caio Barreira", "Produto": "Site", "Type Issue": "Incident", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra", "Labels": "Site, Update", "Proprietário": "Caio Barreira"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Site</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Domain -->
+                        <div class="request-type-container" 
+                             data-target="web-domain" 
+                             data-title="Domain"
+                             data-config='{"Cesta de atendimento": "Hugo Martins", "Produto": "Domain", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS - Infra", "Labels": "Domain, Settings, Domain Removal, Domain Purchase", "Proprietário": "Hugo Martins"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Domain</h5></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRUPO 10: IMPROVEMENTS -->
+                <div class="category-group">
+                    <div class="node">
+                        <h4>IMPROVEMENTS</h4>
+                    </div>
+                    <div class="request-type-block">
+                        <!-- NÍVEL 3: Doubt -->
+                        <div class="request-type-container" 
+                             data-target="imp-doubt" 
+                             data-title="Doubt"
+                             data-config='{"Cesta de atendimento": "N1 Service", "Produto": "Doubt", "Type Issue": "Incident / Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "-ADV: Service Generic workflow for Jira Service Management", "Labels": "Improvement, FAQ, Process, Metrics, New Services, Support, Configuration", "Proprietário": "N1 Service"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Doubt</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Process /FAQ -->
+                        <div class="request-type-container" 
+                             data-target="imp-process" 
+                             data-title="Process /FAQ"
+                             data-config='{"Cesta de atendimento": "Victoria Hoff", "Produto": "Process / FAQ´s", "Type Issue": "-", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS Workflow - Defaut Portal Technology v5", "Labels": "Process /FAQ", "Proprietário": "Victoria Hoff"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Process /FAQ</h5></div>
+                        </div>
+                        <!-- NÍVEL 3: Suggest Improvement -->
+                        <div class="request-type-container" 
+                             data-target="imp-suggest" 
+                             data-title="Suggest Improvement"
+                             data-config='{"Cesta de atendimento": "Victoria Hoff", "Produto": "Improvement", "Type Issue": "Request", "Criticidade": ["-"], "SLA N1": "-", "SLA N2": "-", "SLA ESP": "-", "Workflow": "ITS: Change Management workflow for Jira Service Management v2", "Labels": "Improvement", "Proprietário": "Victoria Hoff"}'
+                             onclick="showPanel('form-detail-panel', this)">
+                            <div class="request-type-node"><h5>Suggest Improvement</h5></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAINEL DE DETALHES (Compartilhado) -->
+        <section id="panel-container" class="container">
+            <!-- Navegação de Painel Injetada Aqui -->
+            
+            <!-- Container do Formulário (Visão do Usuário Final) -->
+            <div id="form-detail-panel" class="visible">
+                <div id="form-detail-content">
+                    <h2>Selecione um Tipo de Requisição Acima</h2>
+                    <p style="text-align: center; color: var(--color-mid-gray);">Clique em qualquer caixa roxa na árvore para visualizar os campos de preenchimento simulados.</p>
+                </div>
+            </div>
+            
+            <!-- Container do Backoffice (Visão do Administrador) -->
+            <div id="backoffice-panel" class="container">
+                <div id="backoffice-content">
+                    <!-- O conteúdo será injetado aqui -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Variável para armazenar o elemento Request Type clicado por último
+        let lastClickedContainer = null;
+
+        // Estrutura de templates dos campos de formulário
+        const formFieldTemplates = {
+            'adv-issues': `
+                <div class="form-field-group"><label for="f-adv-sum">Summary</label><input type="text" name="f-adv-sum" required></div>
+                <div class="form-field-group"><label for="f-adv-desc">Description</label><textarea name="f-adv-desc" rows="4"></textarea></div>
+                <div class="form-field-group"><label for="f-adv-prio">Priority</label><select name="f-adv-prio"><option>Baixa</option><option>Média</option><option>Alta</option></select></div>
+                <div class="form-field-group"><label for="f-adv-meet">Meeting required?</label><select name="f-adv-meet"><option>Sim</option><option>Não</option></select></div>
+                <div class="form-field-group"><label for="f-adv-plat">Platform</label><input type="text" name="f-adv-plat"></div>
+                <div class="form-field-group"><label for="f-adv-script">ScriptID</label><input type="text" name="f-adv-script"></div>
+                <div class="form-field-group"><label for="f-adv-attach">Attachment</label><input type="file" name="f-adv-attach"></div>
+            `,
+            'adv-creatives': `
+                <div class="form-field-group"><label for="f-c-sum">Summary</label><input type="text" name="f-c-sum"></div>
+                <div class="form-field-group"><label for="f-c-desc">Description</label><textarea name="f-c-desc" rows="4"></textarea></div>
+                <div class="form-field-group"><label for="f-c-marca">Marca</label><input type="text" name="f-c-marca"></div>
+                <div class="form-field-group"><label for="f-c-vert">Vertical</label><input type="text" name="f-c-vert"></div>
+                <div class="form-field-group"><label for="f-c-name">Nome do criativo</label><input type="text" name="f-c-name"></div>
+                <div class="form-field-group"><label for="f-c-geo">Geo</label><input type="text" name="f-c-geo"></div>
+                <div class="form-field-group"><label for="f-c-attach">Attachment</label><input type="file" name="f-c-attach"></div>
+                <div class="form-field-group"><label for="f-c-prio">Prioridade</label><select name="f-c-prio"><option>Baixa</option><option>Média</option><option>Alta</option></select></div>
+            `,
+            'adv-hook': `
+                <div class="form-field-group"><label for="f-h-sum">Summary</label><input type="text" name="f-h-sum"></div>
+                <div class="form-field-group"><label for="f-h-desc">Description</label><textarea name="f-h-desc" rows="4"></textarea></div>
+                <div class="form-field-group"><label for="f-h-script">ScriptID</label><input type="text" name="f-h-script"></div>
+                <div class="form-field-group"><label for="f-h-prio">Priority</label><select name="f-h-prio"><option>Baixa</option><option>Média</option><option>Alta</option></select></div>
+                <div class="form-field-group"><label for="f-h-attach">Attachment</label><input type="file" name="f-h-attach"></div>
+            `,
+            'adv-fingerprint': `
+                <div class="form-field-group"><label for="f-f-sum">Summary</label><input type="text" name="f-f-sum"></div>
+                <div class="form-field-group"><label for="f-f-desc">Description</label><textarea name="f-f-desc" rows="4"></textarea></div>
+                <div class="form-field-group"><label for="f-f-brand">Brand</label><input type="text" name="f-f-brand"></div>
+                <div class="form-field-group"><label for="f-f-geo">Geography</label><input type="text" name="f-f-geo"></div>
+                <div class="form-field-group"><label for="f-f-tracker">Tracker Type</label><input type="text" name="f-f-tracker"></div>
+            `,
+            'adv-traffic': `
+                <div class="form-field-group"><label for="f-t-sum">Summary</label><input type="text" name="f-t-sum"></div>
+                <div class="form-field-group"><label for="f-t-desc">Description</label><textarea name="f-t-desc" rows="4"></textarea></div>
+                <div class="form-field-group"><label for="f-t-meet">Meeting Required?</label><select name="f-t-meet"><option>Sim</option><option>Não</option></select></div>
+                <div class="form-field-group"><label for="f-t-attach">Attachment</label><input type="file" name="f-t-attach"></div>
+                <div class="form-field-group"><label for="f-t-script">ScriptID</label><input type="text" name="f-t-script"></div>
+                <div class="form-field-group"><label for="f-t-plat">Plataform</label><input type="text" name="f-t-plat"></div>
+                <div class="form-field-group"><label for="f-t-method">Implementation Method</label><input type="text" name="f-t-method"></div>
+                <div class="form-field-group"><label for="f-t-prio">Priority</label><select name="f-t-prio"><option>Baixa</option><option>Média</option><option>Alta</option></select></div>
+            `,
+            'soft-issues': `
+                <div class="form-field-group"><label for="f-s-sum">Summary*</label><input type="text" name="f-s-sum" required></div>
+                <div class="form-field-group"><label for="f-s-desc">Description</label><textarea name="f-s-desc" rows="4"></textarea></div>
+                <div class="form-field-group"><label for="f-s-type">Software Type*</label><input type="text" name="f-s-type" required></div>
+                <div class="form-field-group"><label for="f-s-attach">Attachment</label><input type="file" name="f-s-attach"></div>
+                <div class="form-field-group"><label for="f-s-prio">Priority</label><select name="f-s-prio"><option>Baixa</option><option>Média</option><option>Alta</option></select></div>
+            `,
+            'hard-accessories': `
+                <div class="form-field-group"><label for="f-hacc-item">Item (Mouse, Monitor, etc.)</label><input type="text" name="f-hacc-item"></div>
+                <div class="form-field-group"><label for="f-hacc-type">Tipo de Solicitação</label><select name="f-hacc-type"><option>Solicitar</option><option>Reportar Problema</option></select></div>
+                <div class="form-field-group"><label for="f-hacc-desc">Description</label><textarea name="f-hacc-desc" rows="2"></textarea></div>
+            `,
+            'hard-notebook': `
+                <div class="form-field-group"><label for="f-hnb-type">Tipo de Solicitação</label><select name="f-hnb-type"><option>Reportar Lentidão/Avaria</option><option>Solicitar Novo Equipamento</option><option>Compra de Equipamento Obsoleto</option></select></div>
+                <div class="form-field-group"><label for="f-hnb-desc">Description</label><textarea name="f-hnb-desc" rows="4"></textarea></div>
+            `,
+            'hard-printer': `
+                <div class="form-field-group"><label for="f-hpr-type">Tipo de Solicitação</label><select name="f-hpr-type"><option>Solicitar Instalação</option><option>Reportar Problema na Impressora</option><option>Reportar Problema de E-mail</option></select></div>
+                <div class="form-field-group"><label for="f-hpr-desc">Description</label><textarea name="f-hpr-desc" rows="2"></textarea></div>
+            `,
+            'access-internal': `
+                <div class="form-field-group"><label for="f-ai-app">Aplicação</label><input type="text" name="f-ai-app" placeholder="Ex: B2B, Approvals"></div>
+                <div class="form-field-group"><label for="f-ai-type">Tipo de Acesso</label><select name="f-ai-type"><option>Novo Acesso</option><option>Remoção de Acesso</option><option>Mudança de Permissões</option><option>Erro de Acesso/Usuário</option></select></div>
+                <div class="form-field-group"><label for="f-ai-lic">Licença (se aplicável)</label><input type="text" name="f-ai-lic"></div>
+            `,
+            'access-external': `
+                <div class="form-field-group"><label for="f-ae-app">Aplicação</label><input type="text" name="f-ae-app" placeholder="Ex: Similar Web, VPN, Jira"></div>
+                <div class="form-field-group"><label for="f-ae-type">Tipo de Solicitação</label><select name="f-ae-type"><option>Novo Acesso</option><option>Mudança de Permissões</option><option>Reportar Problema</option></select></div>
+                <div class="form-field-group"><label for="f-ae-desc">Description</label><textarea name="f-ae-desc" rows="2"></textarea></div>
+            `,
+            'access-email': `
+                <div class="form-field-group"><label for="f-ae-type">Tipo de Solicitação</label><select name="f-ae-type"><option>Reportar Problema de Acesso</option><option>Mudar Permissões</option><option>Solicitar Novo Acesso</option></select></div>
+                <div class="form-field-group"><label for="f-ae-desc">Description</label><textarea name="f-ae-desc" rows="2"></textarea></div>
+            `,
+            'out-admission': `
+                <div class="form-field-group"><label for="f-oa-name">Nome do Colaborador</label><input type="text" name="f-oa-name"></div>
+                <div class="form-field-group"><label for="f-oa-data">Data de Início</label><input type="date" name="f-oa-data"></div>
+                <div class="form-field-group"><label for="f-oa-equipe">Equipe</label><input type="text" name="f-oa-equipe"></div>
+            `,
+            'out-resignation': `
+                <div class="form-field-group"><label for="f-or-name">Nome do Colaborador</label><input type="text" name="f-or-name"></div>
+                <div class="form-field-group"><label for="f-or-data">Último dia de trabalho</label><input type="date" name="f-or-data"></div>
+                <div class="form-field-group"><label for="f-or-motivo">Motivo da Saída</label><input type="text" name="f-or-motivo"></div>
+            `,
+            'out-mobility': `
+                <div class="form-field-group"><label for="f-om-name">Nome do Colaborador</label><input type="text" name="f-om-name"></div>
+                <div class="form-field-group"><label for="f-om-new-team">Nova Equipe</label><input type="text" name="f-om-new-team"></div>
+                <div class="form-field-group"><label for="f-om-data">Data da Mudança</label><input type="date" name="f-om-data"></div>
+            `,
+            'data-kibana': `
+                <div class="form-field-group"><label for="f-dk-sum">Summary</label><input type="text" name="f-dk-sum"></div>
+                <div class="form-field-group"><label for="f-dk-desc">Description</label><textarea name="f-dk-desc" rows="4"></textarea></div>
+                <div class="form-field-group"><label for="f-dk-type">Service Type</label><input type="text" name="f-dk-type" placeholder="Ex: inconsistent data"></div>
+                <div class="form-field-group"><label for="f-dk-attach">Attachment</label><input type="file" name="f-dk-attach"></div>
+            `,
+            'data-database': `
+                <div class="form-field-group"><label for="f-ddb-sum">Summary</label><input type="text" name="f-ddb-sum"></div>
+                <div class="form-field-group"><label for="f-ddb-db">Select Data Base</label><input type="text" name="f-ddb-db"></div>
+                <div class="form-field-group"><label for="f-ddb-desc">Description</label><textarea name="f-ddb-desc" rows="4"></textarea></div>
+                <div class="form-field-group"><label for="f-ddb-attach">Attachment</label><input type="file" name="f-ddb-attach"></div>
+            `,
+            'data-powerbi': `
+                <div class="form-field-group"><label for="f-dpbi-sum">Summary</label><input type="text" name="f-dpbi-sum"></div>
+                <div class="form-field-group"><label for="f-dpbi-type">Tipo de Solicitação</label><select name="f-dpbi-type"><option>IT Dashboard Improvement</option><option>Inconsistent data</option><option>New Vision</option><option>Data Adjustment</option></select></div>
+                <div class="form-field-group"><label for="f-dpbi-desc">Description</label><textarea name="f-dpbi-desc" rows="4"></textarea></div>
+                <div class="form-field-group"><label for="f-dpbi-attach">Attachment</label><input type="file" name="f-dpbi-attach"></div>
+            `,
+            'net-antivirus': `
+                <div class="form-field-group"><label for="f-na-type">Tipo de Solicitação</label><select name="f-na-type"><option>Installation</option><option>Configuration</option><option>Safe Removal</option><option>Settings</option></select></div>
+                <div class="form-field-group"><label for="f-na-desc">Description</label><textarea name="f-na-desc" rows="2"></textarea></div>
+            `,
+            'net-wifi': `
+                <div class="form-field-group"><label for="f-nw-type">Tipo de Solicitação</label><select name="f-nw-type"><option>Wi-fi Installation/Maintenance</option><option>Network Cable Setup</option></select></div>
+                <div class="form-field-group"><label for="f-nw-desc">Description</label><textarea name="f-nw-desc" rows="2"></textarea></div>
+            `,
+            'sec-phishing': `
+                <div class="form-field-group"><label for="f-sp-url">URL da Ameaça</label><input type="text" name="f-sp-url" placeholder="URL ou e-mail suspeito"></div>
+                <div class="form-field-group"><label for="f-sp-desc">Description</label><textarea name="f-sp-desc" rows="4"></textarea></div>
+            `,
+            'sec-newsol': `
+                <div class="form-field-group"><label for="f-sn-name">Nome da Solução</label><input type="text" name="f-sn-name"></div>
+                <div class="form-field-group"><label for="f-sn-just">Justificativa</label><textarea name="f-sn-just" rows="4"></textarea></div>
+            `,
+            'sec-biometric': `
+                <div class="form-field-group"><label for="f-sb-type">Tipo de Problema</label><select name="f-sb-type"><option>Setup</option><option>Access Issue</option><option>Malfunction</option></select></div>
+                <div class="form-field-group"><label for="f-sb-desc">Description</label><textarea name="f-sb-desc" rows="4"></textarea></div>
+            `,
+            'sec-info': `
+                <div class="form-field-group"><label for="f-si-desc">Description</label><textarea name="f-si-desc" rows="4"></textarea></div>
+            `,
+            'web-site': `
+                <div class="form-field-group"><label for="f-ws-type">Tipo de Solicitação</label><select name="f-ws-type"><option>Threat Identification</option><option>Update Site</option></select></div>
+                <div class="form-field-group"><label for="f-ws-desc">Description</label><textarea name="f-ws-desc" rows="4"></textarea></div>
+            `,
+            'web-domain': `
+                <div class="form-field-group"><label for="f-wd-type">Tipo de Solicitação</label><select name="f-wd-type"><option>Acquisition/Renewal</option><option>Settings (DNS, Redirect)</option><option>Domain Removal</option></select></div>
+                <div class="form-field-group"><label for="f-wd-name">Domain Name</label><input type="text" name="f-wd-name"></div>
+                <div class="form-field-group"><label for="f-wd-desc">Description</label><textarea name="f-wd-desc" rows="2"></textarea></div>
+            `,
+            'imp-doubt': `
+                <div class="form-field-group"><label for="f-id-type">Tipo de Dúvida</label><select name="f-id-type"><option>Improvement</option><option>FAQ</option><option>Process</option><option>Metrics</option><option>New Services</option></select></div>
+                <div class="form-field-group"><label for="f-id-desc">Description / Question</label><textarea name="f-id-desc" rows="4"></textarea></div>
+            `,
+            'imp-process': `
+                <div class="form-field-group"><label for="f-ipf-type">Ação</label><select name="f-ipf-type"><option>Solicitar Novo FAQ/Processo</option><option>Reportar Inconsistência</option></select></div>
+                <div class="form-field-group"><label for="f-ipf-desc">Description</label><textarea name="f-ipf-desc" rows="4"></textarea></div>
+            `,
+            'imp-suggest': `
+                <div class="form-field-group"><label for="f-is-area">Área/Processo Sugerido</label><input type="text" name="f-is-area"></div>
+                <div class="form-field-group"><label for="f-is-desc">Description / Sugestão</label><textarea name="f-is-desc" rows="4"></textarea></div>
+            `
+        };
+
+
+        // Função para mostrar o painel de detalhes (Formulário ou Backoffice)
+        function showPanel(panelId, container) {
+            const formPanel = document.getElementById('form-detail-panel');
+            const backofficePanel = document.getElementById('backoffice-panel');
+            
+            // Armazena o container clicado para uso na navegação interna do painel
+            if (container) {
+                lastClickedContainer = container;
+            } else {
+                container = lastClickedContainer;
+                if (!container) return; // Se não houver clique anterior, sai
+            }
+
+            // 1. Desativar destaque de todos os Request Types
+            document.querySelectorAll('.request-type-container').forEach(c => {
+                c.classList.remove('is-active');
+            });
+            container.classList.add('is-active');
+
+            // 2. Esconder ambos os painéis
+            formPanel.classList.remove('visible');
+            backofficePanel.classList.remove('visible');
+            formPanel.style.display = 'none';
+            backofficePanel.style.display = 'none';
+
+            // 3. Renderizar e mostrar o painel correto
+            if (panelId === 'form-detail-panel') {
+                renderForm(container);
+                formPanel.classList.add('visible');
+                formPanel.style.display = 'block';
+                injectPanelNavigation(container.getAttribute('data-title'));
+            } else if (panelId === 'backoffice-panel') {
+                renderBackoffice(container);
+                backofficePanel.classList.add('visible');
+                backofficePanel.style.display = 'block';
+                injectPanelNavigation(container.getAttribute('data-title'));
+            }
+
+            // 4. Rolar a página até o Painel Container
+            document.getElementById('panel-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Função para injetar os botões de navegação dentro do painel
+        function injectPanelNavigation(title) {
+            const container = lastClickedContainer;
+            
+            let nav = document.getElementById('panel-nav-buttons');
+            
+            if (!nav) {
+                nav = document.createElement('div');
+                nav.id = 'panel-nav-buttons';
+                nav.classList.add('panel-nav');
+                
+                const formButton = document.createElement('button');
+                formButton.innerText = 'FORMULÁRIO (USUÁRIO)';
+                formButton.onclick = () => showPanel('form-detail-panel');
+                
+                const backofficeButton = document.createElement('button');
+                backofficeButton.innerText = 'CONFIGURAÇÃO (ADMIN)';
+                backofficeButton.onclick = () => showPanel('backoffice-panel');
+                
+                document.getElementById('panel-container').appendChild(nav); // Adiciona antes dos painéis
+                nav.appendChild(formButton);
+                nav.appendChild(backofficeButton);
+            }
+
+            // Define qual botão está ativo
+            nav.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (document.getElementById('form-detail-panel').classList.contains('visible')) {
+                 nav.querySelector('button:nth-child(1)').classList.add('active');
+            } else if (document.getElementById('backoffice-panel').classList.contains('visible')) {
+                nav.querySelector('button:nth-child(2)').classList.add('active');
+            }
+        }
+
+        // Função de Renderização do Formulário (Visão do Usuário Final)
+        function renderForm(container) {
+            const targetId = container.getAttribute('data-target');
+            const contentArea = document.getElementById('form-detail-content');
+            const requestTitle = container.getAttribute('data-title');
+            
+            // Puxa o template do objeto JS
+            const formTemplate = formFieldTemplates[targetId] || `<p>Formulário não encontrado para ${targetId}.</p>`;
+
+            contentArea.innerHTML = `
+                <h2>${requestTitle}</h2>
+                <form onsubmit="event.preventDefault(); simulateSubmission('${requestTitle}');">
+                    ${formTemplate}
+                    <div class="submit-area">
+                        <button type="submit">ENVIAR REQUISIÇÃO (SIMULAÇÃO)</button>
+                    </div>
+                </form>
+            `;
+        }
+        
+        // Função de Renderização do Backoffice (Visão do Administrador)
+        function renderBackoffice(container) {
+            const backofficeContent = document.getElementById('backoffice-content');
+            const requestTitle = container.getAttribute('data-title');
+            const configJson = container.getAttribute('data-config');
+            
+            if (!configJson) {
+                backofficeContent.innerHTML = `<h2>${requestTitle}</h2><p style="text-align: center; color: var(--color-mid-gray);">Dados de configuração interna não disponíveis para este Request Type.</p>`;
+                return;
+            }
+            
+            const config = JSON.parse(configJson);
+            
+            let html = `<h2>${requestTitle}</h2>`;
+            html += `<div class="backoffice-grid">`;
+
+            // 1. Metadados Principais
+            html += `<div class="metadata-section"><h3>Metadados Principais</h3>`;
+            html += `<div><strong>Cesta Atendimento:</strong> ${config['Cesta de atendimento']}</div>`;
+            html += `<div><strong>Produto:</strong> ${config['Produto']}</div>`;
+            html += `<div><strong>Proprietário:</strong> ${config['Proprietário']}</div>`;
+            html += `<div><strong>Tipo de Issue:</strong> ${config['Type Issue']}</div>`;
+            html += `<div><strong>Criticidade:</strong> ${Array.isArray(config['Criticidade']) ? config['Criticidade'].join(', ') : config['Criticidade']}</div>`;
+            html += `</div>`;
+
+            // 2. Workflows e SLAs
+            html += `<div class="metadata-section"><h3>SLA & Workflow</h3>`;
+            html += `<div><strong>Workflow:</strong> ${config['Workflow']}</div>`;
+            html += `<div><strong>SLA N1:</strong> ${config['SLA N1']}</div>`;
+            html += `<div><strong>SLA N2:</strong> ${config['SLA N2']}</div>`;
+            html += `<div><strong>SLA ESP:</strong> ${config['SLA ESP']}</div>`;
+            html += `</div>`;
+
+            // 3. Labels (Campos de Formulário do Jira Issue)
+            if (config['Labels'] && config['Labels'] !== '-') {
+                html += `<div class="metadata-section" style="grid-column: 1 / -1;"><h3>Labels Internos / Categorias de Fechamento</h3>`;
+                html += `<div class="metadata-full-text"><p>${config['Labels'].split(',').map(label => `<span style="display:inline-block; margin: 2px 5px; padding: 2px 5px; background-color: var(--color-highlight); color: var(--color-header-text); border-radius: 3px; font-weight: 600; font-size: 0.8rem;">${label.trim()}</span>`).join(' ')}</p></div>`;
+                html += `</div>`;
+            }
+            
+            html += `</div>`; // Fecha backoffice-grid
+
+            backofficeContent.innerHTML = html;
+        }
+
+        // Função para simular o envio do formulário
+        function simulateSubmission(requestTitle) {
+            console.log(`[SIMULAÇÃO] Requisição para '${requestTitle}' enviada com sucesso!`);
+            
+            const form = document.querySelector('#form-detail-content form');
+            const data = {};
+            new FormData(form).forEach((value, key) => data[key] = value);
+            
+            alert(`Requisição Simulada Enviada! \nTipo: ${requestTitle}\nVerifique o console para os detalhes completos dos dados coletados.`);
+            console.log("Dados do Formulário Submetido:", data);
+        }
+
+        // Chamada inicial para configurar o painel
+        document.addEventListener('DOMContentLoaded', () => {
+             // Esconde ambos os painéis no carregamento e deixa o JavaScript controlar a exibição.
+            document.getElementById('form-detail-panel').style.display = 'none';
+            document.getElementById('backoffice-panel').style.display = 'none';
+        });
+
+    </script>
+
+</body>
+</html>
